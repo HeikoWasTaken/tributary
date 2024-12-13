@@ -1,8 +1,14 @@
 import requests
 
-data = {
-    "engine_temperature": 0.3,
-}
+def hit_record_endpoint():
+    data = {"engine_temperature": 0.3}
+    response = requests.post("http://0.0.0.0:8000/record", json=data)
+    return response.content
 
-response = requests.post("http://0.0.0.0:8000/record", json=data)
-print(response.content)
+def hit_collect_endpoint():
+    response = requests.post("http://0.0.0.0:8000/collect")
+    return response.content
+
+if __name__ == "__main__":
+    # print(hit_collect_endpoint())
+    print(hit_record_endpoint())
