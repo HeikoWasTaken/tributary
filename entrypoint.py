@@ -39,13 +39,16 @@ def collect_engine_temperature():
     engine_temperatures = [float(r) for r in database.lrange(DATA_KEY, 0, -1)]
     logger.info(f"engine temperature list retrieved from redis: {engine_temperatures}")
 
-    latest_temperature_value = engine_temperatures[0]
-    logger.info(f"newest engine temperature in redis: {latest_temperature_value}")
+    latest_temperature = engine_temperatures[0]
+    logger.info(f"current engine temperature: {latest_temperature}")
 
     mean_temperature = round(sum(engine_temperatures)/len(engine_temperatures), 2)
     logger.info(f"average engine temperature: {mean_temperature}")
 
     logger.info(f"collect request successful")
-    return {"success": True, "temperature_data":{
-        "latest": latest_temperature_value, "average": mean_temperature}
+    response = {
+        "success": True,
+        "current_engine_temperature": latest_temperature,
+        "average_engine_temperature": mean_temperature
     }, 200
+    return response

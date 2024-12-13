@@ -10,5 +10,5 @@ def hit_collect_endpoint():
     return response.content
 
 if __name__ == "__main__":
-    # print(hit_collect_endpoint())
-    print(hit_record_endpoint())
+    # print(hit_record_endpoint())
+    print(hit_collect_endpoint())
