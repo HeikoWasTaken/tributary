@@ -8,10 +8,8 @@ HISTORY_LENGTH = 10
 DATA_KEY = "engine_temperature"
 
 
-# create a Flask server, and allow us to interact with it using the app variable
 app = Flask(__name__)
 
-# define an endpoint which accepts POST requests, and is reachable from the /record endpoint
 @app.route('/record', methods=['POST'])
 def record_engine_temperature():
     payload = request.get_json(force=True)
@@ -34,5 +32,20 @@ def record_engine_temperature():
 
 @app.route('/collect', methods=['POST'])
 def collect_engine_temperature():
-    logger.debug("/collect endpoint called")
-    return {"success": True}, 200
+    # payload = request.get_json(force=True)
+    # logger.info(f"(*) record request --- {json.dumps(payload)} (*)")
+
+    database = redis.Redis(host="redis", port=6379, db=0, decode_responses=True)
+    engine_temperatures = [float(r) for r in database.lrange(DATA_KEY, 0, -1)]
+    logger.info(f"engine temperature list retrieved from redis: {engine_temperatures}")
+
+    latest_temperature_value = engine_temperatures[0]
+    logger.info(f"newest engine temperature in redis: {latest_temperature_value}")
+
+    mean_temperature = round(sum(engine_temperatures)/len(engine_temperatures), 2)
+    logger.info(f"average engine temperature: {mean_temperature}")
+
+    logger.info(f"collect request successful")
+    return {"success": True, "temperature_data":{
+        "latest": latest_temperature_value, "average": mean_temperature}
+    }, 200
